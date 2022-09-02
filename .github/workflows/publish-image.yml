@@ -10,7 +10,6 @@ on:
       - '**.html'
 
 env:
-  DOCKER_BUILDKIT: 1
   KAFKA_VERSION: 3.2.1
 
 jobs:
