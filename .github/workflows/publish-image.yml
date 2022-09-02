@@ -1,4 +1,4 @@
-name: Build and Publish centos Image
+name: Build and Publish Image
 
 on:
   # Trigger the workflow on push or pull request,
@@ -6,16 +6,12 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "centos/**"
-      - "util/**"
+    paths-ignore:
+      - '**.html'
 
 env:
-  NEED_PUSH: 1
-  PUSH_TO_OFFICAL: 1
   DOCKER_BUILDKIT: 1
-  BUILD_NAME: centos
-
+  KAFKA_VERSION: 3.2.1
 
 jobs:
   build:
@@ -41,37 +37,23 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Build and push centos
+      - name: Build and push 
         uses: docker/build-push-action@v3
         with:
-          context: ./centos
-          file: ./centos/centos.Dockerfile
+          context: ./
+          build-args: |
+            KAFKA_VERSION=${{ env.KAFKA_VERSION }}
           push: true
-          tags: yunnysunny/centos:latest
-          cache-from: type=registry,ref=yunnysunny/centos:buildcache
-          cache-to: type=registry,ref=yunnysunny/centos:buildcache,mode=max
-      - name: Update centos description
+          tags: |
+            yunnysunny/kafka:latest
+            yunnysunny/kafka:${{ env.KAFKA_VERSION }}
+          cache-from: type=registry,ref=yunnysunny/kafka:buildcache
+          cache-to: type=registry,ref=yunnysunny/kafka:buildcache,mode=max
+      - name: Update kafka description
         uses: peter-evans/dockerhub-description@v2
         if: ${{ github.event_name != 'pull_request' }}
         with:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          repository: yunnysunny/centos
-          readme-filepath: ./centos/README.md
-      - name: Build and push jdk11
-        uses: docker/build-push-action@v3
-        with:
-          context: ./centos
-          file: ./centos/java.Dockerfile
-          push: true
-          tags: yunnysunny/jdk11:latest
-          cache-from: type=registry,ref=yunnysunny/jdk11:buildcache
-          cache-to: type=registry,ref=yunnysunny/jdk11:buildcache,mode=max
-      - name: Update jdk11 description
-        uses: peter-evans/dockerhub-description@v2
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          repository: yunnysunny/jdk11
-          readme-filepath: ./centos/README.md
+          repository: yunnysunny/kafka
+      
