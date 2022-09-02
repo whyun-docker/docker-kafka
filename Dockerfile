@@ -1,4 +1,4 @@
-FROM yunnysunny/zookeeper:3.7.0
+FROM yunnysunny/zookeeper:3.7.1
 
 ARG KAFKA_VERSION
 
@@ -14,3 +14,5 @@ COPY kafka /etc/init.d/kafka
 
 COPY start_kafka.sh /start.sh
 ENV LOG_DIR=/data/app/log
+ENV KAFKA_PIDFILE=/var/run/kafka/kafka.pid
+CMD [ "/start.sh" ]

@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # /etc/init.d/kafka: start the kafka daemon.
 
 # chkconfig: - 80 20
@@ -20,12 +20,11 @@ DESC="kafka daemon"
 RETVAL=0
 STARTUP_WAIT=30
 SHUTDOWN_WAIT=30
-KAFKA_PIDFILE=/var/run/kafka/kafka.pid
 
 mkdir -p $(dirname $KAFKA_PIDFILE)
 
 # Source function library.
-. /etc/init.d/functions
+. /lib/lsb/init-functions
 
 start() {
     echo -n $"Starting $prog: "
@@ -33,9 +32,9 @@ start() {
   # Create pid file
     if [ -f $KAFKA_PIDFILE ]; then
         read ppid < $KAFKA_PIDFILE
-        if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+        if [ $(ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null) -eq '1' ]; then
             echo -n "$prog is already running"
-            failure
+            log_failure_msg "[failure]"
             echo
             return 1
         else
@@ -48,7 +47,7 @@ start() {
     # Run daemon
     cd $KAFKA_HOME
     $KAFKA_START_SH -daemon $KAFKA_HOME/config/server.properties
-    PID=`jps | grep Kafka | awk '{print $1}'`
+    PID=$(ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}')
     echo $PID > $KAFKA_PIDFILE
 
     count=0
@@ -66,9 +65,9 @@ start() {
         let count=$count+1;
     done
     if [ $launched = 'true' ] ; then
-        success
+        log_success_msg "[OK]"
     else
-        failure
+        log_failure_msg "[failure]"
     fi
     echo
     return 0
@@ -78,7 +77,7 @@ stop() {
     echo -n $"Stopping $prog: "
     $KAFKA_STOP_SH
     rm -rf $KAFKA_PIDFILE
-    success
+    log_success_msg "[OK]"
     echo
 }
 
@@ -95,7 +94,7 @@ restart() {
 status() {
     if [ -f $KAFKA_PIDFILE ]; then
         read ppid < $KAFKA_PIDFILE
-        if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+        if [ $(ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null) -eq '1' ]; then
             echo "$prog is running (pid $ppid)"
             return 0
         else
