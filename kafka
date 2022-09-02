@@ -1,0 +1,138 @@
+#! /bin/sh
+# /etc/init.d/kafka: start the kafka daemon.
+
+# chkconfig: - 80 20
+# description: kafka
+
+KAFKA_HOME=/opt/kafka
+KAFKA_USER=root
+KAFKA_START_SH=$KAFKA_HOME/bin/kafka-server-start.sh
+KAFKA_STOP_SH=$KAFKA_HOME/bin/kafka-server-stop.sh
+
+KAFKA_CONSOLE_DIR=/data/app/log
+KAFKA_CONSOLE_LOG=${KAFKA_CONSOLE_DIR}/server.log
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
+
+prog=kafka
+DESC="kafka daemon"
+
+RETVAL=0
+STARTUP_WAIT=30
+SHUTDOWN_WAIT=30
+KAFKA_PIDFILE=/var/run/kafka/kafka.pid
+
+mkdir -p $(dirname $KAFKA_PIDFILE)
+
+# Source function library.
+. /etc/init.d/functions
+
+start() {
+    echo -n $"Starting $prog: "
+
+  # Create pid file
+    if [ -f $KAFKA_PIDFILE ]; then
+        read ppid < $KAFKA_PIDFILE
+        if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+            echo -n "$prog is already running"
+            failure
+            echo
+            return 1
+        else
+            rm -f $KAFKA_PIDFILE
+        fi
+    fi
+
+
+
+    # Run daemon
+    cd $KAFKA_HOME
+    $KAFKA_START_SH -daemon $KAFKA_HOME/config/server.properties
+    PID=`jps | grep Kafka | awk '{print $1}'`
+    echo $PID > $KAFKA_PIDFILE
+
+    count=0
+    launched=false
+    sleep 1
+  
+    until [ $count -gt $STARTUP_WAIT ]
+    do
+        grep 'started (kafka.server.KafkaServer)' $KAFKA_CONSOLE_LOG > /dev/null
+        if [ $? -eq 0 ] ; then
+            launched=true
+            break
+        fi
+        sleep 1
+        let count=$count+1;
+    done
+    if [ $launched = 'true' ] ; then
+        success
+    else
+        failure
+    fi
+    echo
+    return 0
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    $KAFKA_STOP_SH
+    rm -rf $KAFKA_PIDFILE
+    success
+    echo
+}
+
+reload() {
+    stop
+    start
+}
+
+restart() {
+    stop
+    start
+}
+
+status() {
+    if [ -f $KAFKA_PIDFILE ]; then
+        read ppid < $KAFKA_PIDFILE
+        if [ `ps --pid $ppid 2> /dev/null | grep -c $ppid 2> /dev/null` -eq '1' ]; then
+            echo "$prog is running (pid $ppid)"
+            return 0
+        else
+            echo "$prog dead but pid file exists"
+            return 1
+        fi
+    fi
+    echo "$prog is not running"
+    return 3
+}
+
+case "$1" in
+start)
+    start
+    ;;
+
+stop)
+    stop
+    ;;
+
+reload)
+    reload
+    ;;
+
+restart)
+    restart
+    ;;
+
+status)
+    status
+    ;;
+*)
+
+echo $"Usage: $0 {start|stop|reload|restart|status}"
+exit 1
+esac
+
+exit $?
+
+
