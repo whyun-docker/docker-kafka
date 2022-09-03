@@ -4,6 +4,8 @@
 
 镜像中数据文件目录设定为 `/data/kafka-logs` 。
 
+目前仅支持通过 localhost 进行访问，不支持
+
 ## 镜像 tag
 
 yunnysunny/kafka:${KAFKA_VERSION}
@@ -11,3 +13,9 @@ yunnysunny/kafka:${KAFKA_VERSION}
 当前支持的版本有
 
 - 3.2.1
+
+## 使用方法
+
+```shell
+docker run --name yk -p 9092:9092 yunnysunny/kafka
+```
