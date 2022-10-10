@@ -12,9 +12,7 @@ KAFKA_ARCHIVE_NAME=$KAFKA_FILENAME.tgz
 #https://mirrors.tuna.tsinghua.edu.cn/apache/kafka/2.7.0/kafka_2.13-2.7.0.tgz
 KAFKA_DOWNLOAD_ADDRESS=https://mirrors.tuna.tsinghua.edu.cn/apache/kafka/$KAFKA_VERSION/$KAFKA_ARCHIVE_NAME
 
-INSTALL_DIR=/opt
 KAFKA_FULL_DIR=$INSTALL_DIR/$KAFKA_FILENAME
-KAFKA_DIR=$INSTALL_DIR/kafka
 KAFKA_SERVICE=kafka
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -35,7 +33,7 @@ if [ ! -e "$KAFKA_ARCHIVE_NAME" ]; then
 fi
 
 echo "Cleaning up..."
-rm -f "$KAFKA_DIR"
+rm -f "$KAFKA_HOME"
 rm -rf "$KAFKA_FULL_DIR"
 rm -rf "/var/run/$KAFKA_SERVICE/"
 rm -f "/etc/init.d/$KAFKA_SERVICE"
@@ -44,11 +42,18 @@ echo "Installation to $KAFKA_FULL_DIR ..."
 mkdir $KAFKA_FULL_DIR
 tar -zxvf $KAFKA_ARCHIVE_NAME -C $INSTALL_DIR
 
-echo "Creating symbolic link: to $KAFKA_DIR ..."
-ln -s $KAFKA_FULL_DIR/ $KAFKA_DIR
+echo "Creating symbolic link: to $KAFKA_HOME ..."
+ln -s $KAFKA_FULL_DIR/ $KAFKA_HOME
 
 
 echo "Cleaning archive..."
 rm -f "$KAFKA_ARCHIVE_NAME"
 
+echo "Generate config file..."
+/data/config.sh
+cat $KAFKA_HOME/config/kraft/server.properties
 
+echo "Formatting log dir..."
+KAFKA_CLUSTER_ID="$($KAFKA_HOME/bin/kafka-storage.sh random-uuid)"
+$KAFKA_HOME/bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID \
+  -c $KAFKA_HOME/config/kraft/server.properties

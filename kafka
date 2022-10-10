@@ -4,8 +4,6 @@
 # chkconfig: - 80 20
 # description: kafka
 
-KAFKA_HOME=/opt/kafka
-KAFKA_USER=root
 KAFKA_START_SH=$KAFKA_HOME/bin/kafka-server-start.sh
 KAFKA_STOP_SH=$KAFKA_HOME/bin/kafka-server-stop.sh
 
@@ -46,7 +44,7 @@ start() {
 
     # Run daemon
     cd $KAFKA_HOME
-    $KAFKA_START_SH -daemon $KAFKA_HOME/config/server.properties
+    $KAFKA_START_SH -daemon $KAFKA_HOME/config/kraft/server.properties
     PID=$(ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}')
     echo $PID > $KAFKA_PIDFILE
 
@@ -56,7 +54,7 @@ start() {
   
     until [ $count -gt $STARTUP_WAIT ]
     do
-        grep 'started (kafka.server.KafkaServer)' $KAFKA_CONSOLE_LOG > /dev/null
+        grep 'Kafka Server started' $KAFKA_CONSOLE_LOG > /dev/null
         if [ $? -eq 0 ] ; then
             launched=true
             break
