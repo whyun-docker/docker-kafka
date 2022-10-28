@@ -1,6 +1,6 @@
 #!/bin/bash
-
-echo "Configuration..."
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
+echo "${DATE} Configuration..."
 . /data/util.sh
 
 export KAFKA_CONF_FILE=$KAFKA_HOME/config/kraft/server.properties

@@ -19,4 +19,6 @@ COPY start_kafka.sh /start.sh
 ENV LOG_DIR=/data/app/log
 ENV KAFKA_PIDFILE=/var/run/kafka/kafka.pid
 ENV KAFKA_HOME=${KAFKA_HOME}
+# 使用东八区时区
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 CMD [ "/start.sh" ]

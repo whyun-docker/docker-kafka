@@ -23,9 +23,9 @@ mkdir -p $(dirname $KAFKA_PIDFILE)
 
 # Source function library.
 . /lib/lsb/init-functions
-
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
 start() {
-    echo -n $"Starting $prog: "
+    echo -n $"${DATE} Starting $prog: "
 
   # Create pid file
     if [ -f $KAFKA_PIDFILE ]; then
@@ -72,7 +72,7 @@ start() {
 }
 
 stop() {
-    echo -n $"Stopping $prog: "
+    echo -n $"${DATE} Stopping $prog: "
     $KAFKA_STOP_SH
     rm -rf $KAFKA_PIDFILE
     log_success_msg "[OK]"
