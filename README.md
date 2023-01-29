@@ -11,6 +11,7 @@ yunnysunny/kafka:${KAFKA_VERSION}
 当前支持的版本有
 
 - 3.3.1
+- 3.3.2
 
 ## 使用方法
 

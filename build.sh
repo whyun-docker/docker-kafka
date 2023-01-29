@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export KAFKA_VERSION=3.3.1
+export KAFKA_VERSION=3.3.2
 TAG_LATEST=yunnysunny/kafka:latest
 TAG_CURRENT=yunnysunny/kafka:${KAFKA_VERSION}
 
