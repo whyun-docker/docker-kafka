@@ -4,7 +4,10 @@ ARG KAFKA_VERSION
 ARG INSTALL_DIR=/opt
 ARG KAFKA_HOME=${INSTALL_DIR}/kafka
 RUN mkdir -p /data
-RUN apt-get update && apt-get install --no-install-recommends wget tzdata -y && apt-get clean
+RUN apt-get update \
+    && apt-get install --no-install-recommends wget tzdata -y \
+    && apt-get clean \
+    && rm /var/lib/apt/lists/* -rf
 ARG KAFKA_DATA_DIR=/data/kafka-logs
 ARG KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
 ARG KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
