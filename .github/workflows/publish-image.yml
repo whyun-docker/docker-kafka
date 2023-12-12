@@ -10,7 +10,7 @@ on:
       - '**.html'
 
 env:
-  KAFKA_VERSION: 3.6.0
+  KAFKA_VERSION: 3.6.1
 
 jobs:
   build:
