@@ -4,16 +4,20 @@ rm -rf /var/run/kafka/kafka.pid
 /data/config.sh
 
 /etc/init.d/kafka start
-
-while true
+RESTART_THRESHOLD=${RESTART_THRESHOLD:-10}
+RESTART_COUNT=0
+while [ $RESTART_COUNT -le "$RESTART_THRESHOLD" ]
 do
     PID=$(cat $KAFKA_PIDFILE)
     if ps -p $PID > /dev/null
     then
         sleep 1
     else
-        echo "kafka not running"
+        DATE=$(date '+%Y-%m-%d %H:%M:%S')
+        echo "${DATE} ===kafka not running==="
         tail -100 /data/app/log/server.log
-        exit 1
+        RESTART_COUNT=$((RESTART_COUNT+1))
+        echo "===restart kafka=== $RESTART_COUNT"
     fi
 done
+exit 1
