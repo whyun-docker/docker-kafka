@@ -18,6 +18,7 @@ yunnysunny/kafka:${KAFKA_VERSION}
 - 3.6.0
 - 3.6.1
 - 3.7.0
+- 3.7.1
 
 ## 使用方法
 
