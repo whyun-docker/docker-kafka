@@ -18,6 +18,7 @@ do
         tail -100 /data/app/log/server.log
         RESTART_COUNT=$((RESTART_COUNT+1))
         echo "===restart kafka=== $RESTART_COUNT"
+        /etc/init.d/kafka start
     fi
 done
 exit 1
